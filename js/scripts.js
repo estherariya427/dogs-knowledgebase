@@ -5,17 +5,15 @@ var foodRepository = (function () {
   function loadList() {
     $.ajax(apiUrl, { dataType: 'json'}).done(function (responseJSON) {
       console.log("success");
-      console.log(responseJSON);
-      var i = 0;
-      var keys = Object.keys(responseJSON.meals[i]);
-      console.log(keys);
-      for (var j in keys) {
+      var data = Object.keys(responseJSON.meals);
+      for (var i = 0; i < data.length; i++) {
+        var obj = responseJSON.meals[i];
         var food = {
-          name: keys[j].strMeal
+          name: obj.strMeal
         }
+        add(food);
+        console.log(food);
       }
-      console.log(food);
-      add(food);
     }).catch(function (e) {
       console.log(e);
     });
@@ -38,7 +36,7 @@ var foodRepository = (function () {
   }
 
   function addListItem(food) {
-    consolelog("in addListItem");
+    console.log("in addListItem");
     // create list element
     var newListItem = document.createElement('li');
     newListItem.classList.add('food-item');
