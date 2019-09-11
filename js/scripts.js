@@ -3,7 +3,7 @@ var foodRepository = (function () {
   var apiUrl = 'https://www.themealdb.com/api/json/v1/1/search.php?s=';
 
   function loadList() {
-    $.ajax(apiUrl, { dataType: 'json'}).done(function (responseJSON) {
+    return $.ajax(apiUrl, { dataType: 'json'}).done(function (responseJSON) {
       console.log("success");
       var data = Object.keys(responseJSON.meals);
       for (var i = 0; i < data.length; i++) {
