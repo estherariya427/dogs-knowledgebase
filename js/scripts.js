@@ -2,6 +2,7 @@ var foodRepository = (function () {
   var repository = [];
   var apiUrl = 'https://www.themealdb.com/api/json/v1/1/search.php?s=';
 
+// Load the list through api provided
   function loadList() {
     return $.ajax(apiUrl, { dataType: 'json'}).done(function (responseJSON) {
       console.log("success");
@@ -13,7 +14,6 @@ var foodRepository = (function () {
           imageUrl: obj.strMealThumb
         };
         add(food);
-        console.log(food);
       }
     }).catch(function (e) {
       console.log(e);
@@ -35,96 +35,52 @@ var foodRepository = (function () {
     return repository;
   }
 
-  function addListItem(food) {
-    // create list element
-    var newListItem = document.createElement('li');
-    newListItem.classList.add('food-item');
-    newListItem.innerText = '';
-
-    // create button element and add name to innerText
-    var newButtonItem = document.createElement('button');
-    newButtonItem.innerText = food.name;
-    newButtonItem.classList.add('buttonStyle');
-
-    // append button to list element
-    newListItem.appendChild(newButtonItem);
-
-    // select the unordered list in the DOM and append list item
-    var $foodList = document.querySelector('.food-list');
-    $foodList.appendChild(newListItem);
-
-    // Adding event Listener when click on the button
-    newButtonItem.addEventListener('click', function(event) {
-      showDetails(food);
-    });
-  }
-
-  var $modalContainer = document.querySelector('#modal-container');
-  function showModal(title, image) {
-
-    $modalContainer.classList.add('is-visible');
-
-    // Clear all existing modal content
-    $modalContainer.innerHTML = '';
-
-    var modal = document.createElement('div');
-    modal.classList.add('modal');
-
-    // Add the new modal content: Name, height, and image
-    var closeButtonElement = document.createElement('button');
-    closeButtonElement.classList.add('modal-close');
-    closeButtonElement.innerText = 'Close';
-    closeButtonElement.addEventListener('click', hideModal);
-
-    var titleElement = document.createElement('h1');
-    titleElement.innerText = title;
-
-    var imageElement = document.createElement('img');
-    imageElement.src = image;
-    imageElement.classList.add('myImage');
-
-    modal.appendChild(closeButtonElement);
-    modal.appendChild(titleElement);
-    modal.appendChild(imageElement);
-    $modalContainer.appendChild(modal);
-
-    $modalContainer.classList.add('is-visible');
-  }
-
-  function hideModal() {
-    $modalContainer.classList.remove('is-visible');
-  }
-
-  function showDetails(food) {
-    showModal(food.name, food.imageUrl);
-  }
-
-  window.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape' && $modalContainer.classList.contains('is-visible')) {
-      hideModal();
-    }
-  });
-
-  $modalContainer.addEventListener('click', (e) => {
-    var target = e.target;
-    if (target === $modalContainer) {
-      hideModal();
-    }
-  });
   return {
     loadList: loadList,
     add: add,
-    getAll: getAll,
-    addListItem: addListItem,
-    showDetails: showDetails,
-    showModal: showModal,
-    hideModal: hideModal
-  }
-
+    getAll: getAll
+  };
 })();
 
+var $foodList = $('.list-group');
+function addListItem(food) {
+
+  // create food list element to button
+  var $button = $('<button type="button" class="btn btn-primary list-group-item list-group-item-action" data-toggle="modal" data-target="#modalContainer"></button>');
+  $button.text(food.name);
+  $foodList.append($button);
+
+  $button.click(function () {
+    showDetails(food);
+  });
+
+}
+  // showing details of food - name and image on Modal
+  function showDetails(food) {
+    $(document).on('click', '.list-group-item', function() {
+      var name = food.name;
+      var image = $('<img class="food-picture" width="200px">');
+      image.attr('src', food.imageUrl);
+
+      $('h5').html(name);
+      $('.modal-body').html(image);
+      $('.modal').modal('show');
+    });
+  }
+
+// Search Food Name from the list group
+$(document).ready(function() {
+  $('#myInput').on('keyup', function() {
+    var value = $(this).val().toLowerCase();
+    $('#myList button').filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
 foodRepository.loadList().then(function() {
-  foodRepository.getAll().forEach(function (food) {
-    foodRepository.addListItem(food);
+  var foodName = foodRepository.getAll();
+  $.each(foodName, function(index, food) {
+    addListItem(food);
   });
 });
