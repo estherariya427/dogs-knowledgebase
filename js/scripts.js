@@ -5,7 +5,7 @@ var foodRepository = (function () {
 // Load the list through api provided
   function loadList() {
     return $.ajax(apiUrl, { dataType: 'json'}).done(function (responseJSON) {
-      console.log("success");
+      console.log('success');
       var data = Object.keys(responseJSON.meals);
       for (var i = 0; i < data.length; i++) {
         var obj = responseJSON.meals[i];
@@ -14,6 +14,7 @@ var foodRepository = (function () {
           imageUrl: obj.strMealThumb
         };
         add(food);
+        console.log(food);
       }
     }).catch(function (e) {
       console.log(e);
